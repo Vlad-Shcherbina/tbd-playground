@@ -13,7 +13,11 @@ Virtualenv is optional.
 
 Third-party python libraries:
  - pip install nose
+ - pip install nose-exclude
  - TODO
+
+Other dependencies:
+ - SWIG 2
 
 Root of this repository should be in `PYTHONPATH`, because imports of our modules are absolute (`from production import utils`). There are several ways to achieve that:
   - add project path to the environment variable (before the contest, don't forget to change path from `tbd-playground` to the actual repository; same for other methods)
