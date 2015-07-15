@@ -2,8 +2,6 @@ import sys, os
 
 import nose
 
-from production import utils
-
 
 if __name__ == '__main__':
     argv = sys.argv + [
