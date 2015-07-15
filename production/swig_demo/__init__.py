@@ -1,16 +1,21 @@
 # Magically compile extension in this package when we try to import it.
 
+import sys
 import os
-from distutils.core import setup, Extension
+
+# Not `from distutils.core import setup`, otherwise nose will attempt to run
+# `setup` function.
+import distutils.core
+
 
 cur_dir = os.getcwd()
 try:
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    setup(
+    distutils.core.setup(
         name='sample',
         py_modules=['sample'],
         ext_modules=[
-            Extension('_sample',
+            distutils.core.Extension('_sample',
                 ['sample.i', 'sample.cpp'],
                 depends=['sample.h'],
                 swig_opts=['-c++'],
