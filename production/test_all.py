@@ -8,4 +8,4 @@ if __name__ == '__main__':
         '--verbose', '--with-doctest',
         '--logging-level=DEBUG',
         ]
-    nose.run_exit(argv=argv)
+    nose.main(argv=argv)

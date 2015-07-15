@@ -13,6 +13,7 @@ Virtualenv is optional.
 
 Third-party python libraries:
  - pip install nose
+ - pip install coverage
  - TODO
 
 Root of this repository should be in `PYTHONPATH`, because imports of our modules are absolute (`from production import utils`). There are several ways to achieve that:
