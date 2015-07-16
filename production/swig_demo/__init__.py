@@ -19,6 +19,8 @@ try:
                 ['sample.i', 'sample.cpp'],
                 depends=['sample.h'],
                 swig_opts=['-c++'],
+                extra_compile_args=['-std=c++11'],
+                undef_macros=['NDEBUG'],  # want assertions
             ),
         ],
         script_args=['build_ext', '--inplace']
