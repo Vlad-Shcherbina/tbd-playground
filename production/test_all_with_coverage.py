@@ -3,8 +3,13 @@ import sys, os
 import nose
 import coverage.cmdline
 
+from production import testing_utils
+
 
 if __name__ == '__main__':
+    testing_utils.make_hypothesis_reproducible()
+    testing_utils.disable_isolation()
+
     argv = sys.argv + [
         'production',
         '--verbose', '--with-doctest',

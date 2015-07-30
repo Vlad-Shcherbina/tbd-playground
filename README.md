@@ -15,6 +15,7 @@ Third-party python libraries:
  - pip install nose
  - pip install nose-exclude
  - pip install coverage
+ - pip install hypothesis
  - TODO
 
 Other dependencies:
