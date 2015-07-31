@@ -15,6 +15,7 @@ import pickle
 import traceback
 import warnings
 import logging
+import inspect
 
 import hypothesis
 from hypothesis.errors import HypothesisException
@@ -27,7 +28,7 @@ class AbnormalExit(Exception):
 
 def isolate_process_failures():
     """
-    Decorate test to run in a forked process.
+    Decorate test method to run in a forked process.
 
     This decorator relies on the assumption that return value or raised
     exception is picklable.
@@ -35,53 +36,24 @@ def isolate_process_failures():
     because nose).
     If child process exits, AbnormalExit will be raised.
 
-    Does not work with hypothesis tests, see isolating_executor.
+    Not that if used with @hypothesis.given, given should only receive
+    keyword arguments.
     """
+
     def decorator(f):
+        # Hopefully this hack with 'self' that limits this decorator to methods
+        # won't be necessary once
+        # https://github.com/DRMacIver/hypothesis/issues/113 is addressed.
+        assert inspect.getargspec(f).args[0] == 'self'
         @functools.wraps(f)
-        def wrapped_f(*args, **kwargs):
-            return isolating_executor(lambda: f(*args, **kwargs))
+        def wrapped_f(self, **kwargs):
+            return _run_in_a_separate_process(lambda: f(self, **kwargs))
         return wrapped_f
 
     return decorator
 
 
-def isolating_executor(f):
-    """
-    Abnormal test failures break test runners and hypothesis minimization,
-    and produce poor diagnostics.
-    Solution is to run risky tests in forked processes and wrap abnormal
-    failures in exceptions.
-
-    Usage:
-        class SomeTests(unittest.TestCase):
-
-            def execute_example(self, f):
-                return isolating_executor(f)
-
-            @hypothesis.given(...)
-            def test_that_is_expected_to_fail_abnormally(...):
-                ...
-
-    Why not use hypothesis.testrunners.forking.ForkingTestCase?
-    First, it does not forward stdout, stderr, and logging,
-    so if they are captured by testing framework, captures made in
-    child process will be lost.
-    Second, because sometimes we might want to disable it at runtime,
-    see disable_isolation().
-
-    Why not
-
-        @hypothesis.given(...)
-        @isolate_process_failures()
-        def test(...):
-            ...
-
-    where isolate_process_failures does not need to know anything about
-    hypothesis internals?
-    Because varargs are not supported with @given.
-    """
-
+def _run_in_a_separate_process(f):
     if not _isolate:
         return f()
     if not hasattr(os, 'fork'):
@@ -125,23 +97,12 @@ def isolating_executor(f):
         # over control pipe and reemit them in the parent.
 
         try:
-            # hypothesis default reporter does not flush, so falsifying example
-            # message could be lost if test terminates abnormally.
-            # hypothesis' own ForkingTestCase addresses it by flushing in child
-            # reporter.
-            # https://github.com/DRMacIver/hypothesis/issues/100
-            # https://github.com/DRMacIver/hypothesis/commit/9f9eedbd16e243aa9880a6fa669515d58af52603
-            with with_reporter(lambda s: (print(s), sys.stdout.flush())):
-                result = f()
+            result = f()
         except BaseException as e:
             pickle.dump((False, e), control_pipe_w)
             # Traceback will be lost when reraising deserialized exception in
             # the parent, so we print it out here.
-            if not isinstance(e, HypothesisException):
-                # This check is not perfect, because some hypothesis exceptions
-                # are not caught by hypothesis. Ideally we want to see stack
-                # trace in such cases.
-                traceback.print_exc()
+            traceback.print_exc()
         else:
             pickle.dump((True, result), control_pipe_w)
 

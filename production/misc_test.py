@@ -50,13 +50,11 @@ class CppMiscTests(unittest.TestCase, CommonMiscTests):
 
 class MiscEquivalenceTests(unittest.TestCase):
 
-    def execute_example(self, f):
-        return testing_utils.isolating_executor(f)
-
     @hypothesis.given(
-        st.integers(2, 8),
-        st.streaming(st.integers(0, 2**8)),
-        st.integers(min_value=0, max_value=100))
+        word_size=st.integers(2, 8),
+        memory=st.streaming(st.integers(0, 2**8)),
+        num_steps=st.integers(min_value=0, max_value=100))
+    @testing_utils.isolate_process_failures()
     def misc_equivalence_test(self, word_size, memory, num_steps):
         m1 = NaiveMisc(word_size)
         for i in range(2**word_size):
