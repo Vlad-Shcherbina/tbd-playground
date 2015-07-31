@@ -13,6 +13,10 @@ public:
     CppMisc(int word_size) : word_size(word_size), memory(1 << word_size), ip(0) {
     }
 
+    int get_ip() const {
+        return ip;
+    }
+
     void set_ip(int ip) {
         assert(ip >= 0);
         assert(ip < memory.size());
@@ -20,14 +24,14 @@ public:
         this->ip = ip;
     }
 
+    int get_word(int addr) {
+        return memory.at(addr);
+    }
+
     void set_word(int addr, int value) {
         assert(value >= 0);
         assert(value < memory.size());
         memory.at(addr) = value;
-    }
-
-    int get_ip() const {
-        return ip;
     }
 
     void step() {

@@ -20,6 +20,15 @@ def canonical_str(m):
     return str(m).replace(m.__class__.__name__, '*Misc')
 
 
+def rotate_machine(m, rot):
+    n = 2**m.word_size
+    m2 = m.__class__(m.word_size)
+    m2.set_ip((m.get_ip() + rot) % n)
+    for i in range(n):
+        m2.set_word((i + rot) % n, m.get_word(i))
+    return m2
+
+
 class CommonMiscTests(object):
 
     Machine = None
@@ -38,6 +47,31 @@ class CommonMiscTests(object):
         m.step()
 
         eq_(canonical_str(m), '*Misc(ip=0, memory=[1, 2, 3, 2])')
+
+    @hypothesis.given(
+        word_size=st.integers(2, 8),
+        memory=st.streaming(st.integers(0, 2**8)),
+        num_steps=st.integers(min_value=0, max_value=100),
+        rot=st.integers(-100, 100))
+    @testing_utils.isolate_process_failures()
+    def test_rotation_invariance(self, word_size, memory, num_steps, rot):
+        m1 = self.Machine(word_size)
+        for i in range(2**word_size):
+            m1.set_word(i, memory[i] % 2**word_size)
+
+        m2 = self.Machine(word_size)
+        for i in range(2**word_size):
+            m2.set_word(i, memory[i] % 2**word_size)
+
+        eq_(str(m1), str(m2))
+
+        m1.simulate(num_steps)
+        m1 = rotate_machine(m1, rot * 4)
+
+        m2 = rotate_machine(m2, rot * 4)
+        m2.simulate(num_steps)
+
+        eq_(str(m1), str(m2))
 
 
 class NaiveMiscTests(unittest.TestCase, CommonMiscTests):
