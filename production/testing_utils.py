@@ -18,8 +18,6 @@ import logging
 import inspect
 
 import hypothesis
-from hypothesis.errors import HypothesisException
-from hypothesis.reporting import with_reporter
 
 
 class AbnormalExit(Exception):

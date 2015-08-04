@@ -8,7 +8,6 @@ import nose
 from nose.tools import eq_
 import hypothesis
 import hypothesis.strategies as st
-from hypothesis.testrunners.forking import ForkingTestCase
 
 from production.naive_misc import NaiveMisc
 from production.cpp_misc.cpp_misc import CppMisc
