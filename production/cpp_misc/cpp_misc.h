@@ -60,7 +60,7 @@ public:
 
     void simulate(int num_steps) {
         assert(num_steps >= 0);
-        for (int i = 0; i < num_steps; i++)
+        for (int i = 0; i < num_steps; ++i)
             step();
     }
 
