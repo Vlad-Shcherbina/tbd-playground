@@ -13,7 +13,6 @@ Virtualenv is optional.
 
 Third-party python libraries:
  - pip install nose
- - pip install coverage
  - pip install nose-exclude
  - pip install coverage
  - pip install hypothesis
