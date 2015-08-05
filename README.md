@@ -18,7 +18,7 @@ Third-party python libraries:
 
 Root of this repository should be in `PYTHONPATH`, because imports of our modules are absolute (`from production import utils`). There are several ways to achieve that:
   - add project path to the environment variable (before the contest, don't forget to change path from `tbd-playground` to the actual repository; same for other methods)
-  - add file `<python installation or venv>/site-packages/tbd.pth` whose content is a single line with project path
+  - add file `<python installation or venv>/lib/python3.4/site-packages/tbd.pth` whose content is a single line with project path
   - configure your favorite IDE appropriately
   - run scripts as `python3 -m production.some_script` instead of `python3 production/some_script.py`, then the location of package `production` will be automatically added to `PYTHONPATH`.
 
